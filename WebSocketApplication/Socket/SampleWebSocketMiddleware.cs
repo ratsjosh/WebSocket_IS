@@ -5,6 +5,9 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using WebSocketApplication.Data;
+using WebSocketApplication.Extensions;
+using static WebSocketApplication.Utils.Conversions.BusArrival;
 
 namespace WebSocketApplication.Socket
 {
@@ -50,8 +53,30 @@ namespace WebSocketApplication.Socket
                         await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Expected a reply", ct);
                         return;
                     }
-                    await SendStringAsync(socket, $"receive message => \"{response}\"", ct);
-
+                    string[] extracts = response.ExtractFeatures();
+                    BusInfo busInfo = new BusInfo();
+                    Information bi = busInfo.GetBusRequest(extracts);
+                    if (bi == null)
+                        await SendStringAsync(socket, $"receive message => \"{response}\"", ct);
+                    else
+                    {
+                        ServiceInformation result = await busInfo.GetBusInformationAsync(bi.StopNumber, bi.BusNumber);
+                        Operation op;
+                        if (Enum.TryParse(result.Services[0].Status.Replace(" ", String.Empty), out op))
+                        {
+                            string message = "";
+                            switch (op)
+                            {
+                                case Operation.InOperation:
+                                    message = $"Bus {result.Services[0].ServiceNo} Next bus: {result.Services[0].NextBus.EstimatedArrival}    -----    Subsequent bus: {result.Services[0].SubsequentBus.EstimatedArrival}    -----    Thereafter: {result.Services[0].SubsequentBus3.EstimatedArrival}";
+                                    break;
+                                case Operation.NotInOperation:
+                                    message = $"Bus {result.Services[0].ServiceNo} is not operating at {DateTime.Now.ToString("h:mm:ss tt") }";
+                                    break;
+                            }
+                            await SendStringAsync(socket, message, ct);
+                        }
+                    }
                     //await Task.Delay(1000, ct);
                 }
             }
