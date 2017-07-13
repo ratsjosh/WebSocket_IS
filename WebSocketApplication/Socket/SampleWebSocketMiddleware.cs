@@ -68,7 +68,9 @@ namespace WebSocketApplication.Socket
                             switch (op)
                             {
                                 case Operation.InOperation:
-                                    message = $"Bus {result.Services[0].ServiceNo} Next bus: {result.Services[0].NextBus.EstimatedArrival}    -----    Subsequent bus: {result.Services[0].SubsequentBus.EstimatedArrival}    -----    Thereafter: {result.Services[0].SubsequentBus3.EstimatedArrival}";
+                                    int nBusT = (Convert.ToDateTime(result.Services[0].NextBus.EstimatedArrival) - DateTime.Now).Minutes;
+                                    int nnBusT = (Convert.ToDateTime(result.Services[0].SubsequentBus.EstimatedArrival) - DateTime.Now).Minutes;
+                                    message = $"Bus {result.Services[0].ServiceNo} Next bus: {nBusT} Min(s). Next next bus: {nnBusT} Min(s)";
                                     break;
                                 case Operation.NotInOperation:
                                     message = $"Bus {result.Services[0].ServiceNo} is not operating at {DateTime.Now.ToString("h:mm:ss tt") }";
