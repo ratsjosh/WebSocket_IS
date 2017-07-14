@@ -52,7 +52,7 @@ namespace WebSocketApplication.Data
             {
                 Uri uri = new Uri("http://datamall2.mytransport.sg/ltaodataservice/BusArrival?" + $"{stopParam}&{ busParam}");
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
-                client.DefaultRequestHeaders.Add("AccountKey", "VfAAnVl4S4q+i1l4KzlLQg==");
+                client.DefaultRequestHeaders.Add("AccountKey", Startup._LTABusArrivalAPIKey);
 
                 var response = await client.GetAsync(uri);
                 response.EnsureSuccessStatusCode();
