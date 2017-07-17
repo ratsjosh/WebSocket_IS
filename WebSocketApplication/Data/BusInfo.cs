@@ -1,10 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static WebSocketApplication.Utils.Conversions.BusArrival;
@@ -23,7 +19,7 @@ namespace WebSocketApplication.Data
 
             // Regex patterns to filter bus information
             string _stopPattern = @"\d{5}";
-            string _busPattern = @"[A-Z]{1,2}\d{1,3}|(\d{1,3}([a-zA-Z]{1})?)(?!\d|\W)";
+            string _busPattern = @"^[a-zA-Z]*\d{1,3}(?!\w)$|^\d{1,3}[a-zA-Z]{1}$";
 
             // Instantiate the regular expression object.
             Regex r1 = new Regex(_stopPattern, RegexOptions.IgnoreCase);

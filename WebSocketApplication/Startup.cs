@@ -14,7 +14,7 @@ namespace WebSocketApplication
 {
     public class Startup
     {
-        public static string _LTABusArrivalAPIKey = null;
+        public static string _LTABusArrivalAPIKey = string.Empty;
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()

@@ -56,8 +56,10 @@ namespace WebSocketApplication.Socket
                     string[] extracts = response.ExtractFeatures();
                     BusInfo busInfo = new BusInfo();
                     Information bi = busInfo.GetBusRequest(extracts);
+
                     if (bi == null)
                         await SendStringAsync(socket, $"Received message => \"{response}\"", ct);
+
                     else
                     {
                         ServiceInformation result = await busInfo.GetBusInformationAsync(bi.StopNumber, bi.BusNumber);
