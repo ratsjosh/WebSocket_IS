@@ -13,6 +13,8 @@ using WebSocketApplication.Data;
 using WebSocketApplication.Models;
 using WebSocketApplication.Services;
 using WebSocketApplication.Socket;
+using WebSocketApplication.Extensions;
+using WebSocketApplication.Socket.Handlers;
 
 namespace WebSocketApplication
 {
@@ -50,21 +52,23 @@ namespace WebSocketApplication
 
             services.AddMvc();
 
+            services.AddWebSocketManager();
+
             // Add application services.
             services.AddTransient<IEmailSender, AuthMessageSender>();
             services.AddTransient<ISmsSender, AuthMessageSender>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
-            // Accept web socket requests
-            app.UseWebSockets();
-            // handle web socket requests
-            app.Map("/ws", (_app) => _app.UseMiddleware<SampleWebSocketMiddleware>());
+            //// Accept web socket requests
+            //app.UseWebSockets();
+            //// handle web socket requests
+            //app.Map("/ws", (_app) => _app.UseMiddleware<SampleWebSocketMiddleware>());
 
 
             if (env.IsDevelopment())
@@ -78,12 +82,14 @@ namespace WebSocketApplication
                 app.UseExceptionHandler("/Home/Error");
             }
 
-            app.UseStaticFiles();
-
             app.UseIdentity();
 
-            // Add external authentication middleware below. To configure them please see https://go.microsoft.com/fwlink/?LinkID=532715
+            app.UseWebSockets();
 
+            app.MapWebSocketManager("/ws", serviceProvider.GetService<ChatMessageHandler>());
+
+            app.UseStaticFiles();
+            
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
