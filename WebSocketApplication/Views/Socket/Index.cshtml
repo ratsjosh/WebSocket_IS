@@ -50,8 +50,8 @@
         var input = $("#text-field").val();
         var message = (input !== "" && input != undefined) ? input : "Empty string...";
 
-        // Create message to be appended into chat
-        $("#chat").append(cmsg("User", message));
+        //// Create message to be appended into chat
+        //$("#chat").append(cmsg("User", message));
 
         // Send message to server through socket
         socket.send(message);

@@ -44,9 +44,6 @@ namespace WebSocketApplication.Socket
                 }
 
             });
-
-            //TODO - investigate the Kestrel exception thrown when this is the last middleware
-            //await _next.Invoke(context);
         }
 
         private async Task Receive(WebSocket socket, Action<WebSocketReceiveResult, byte[]> handleMessage)
@@ -55,8 +52,8 @@ namespace WebSocketApplication.Socket
 
             while (socket.State == WebSocketState.Open)
             {
-                var result = await socket.ReceiveAsync(buffer: new ArraySegment<byte>(buffer),
-                                                       cancellationToken: CancellationToken.None);
+                var result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer),
+                                                       CancellationToken.None);
 
                 handleMessage(result, buffer);
             }
@@ -160,3 +157,5 @@ namespace WebSocketApplication.Socket
         //}
     }
 }
+
+
