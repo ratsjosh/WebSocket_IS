@@ -1,10 +1,15 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Schema;
 using System;
 using System.IO;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using WebSocketApplication.Extensions;
+using WebSocketApplication.Models;
 
 namespace WebSocketApplication.Socket
 {
@@ -33,7 +38,20 @@ namespace WebSocketApplication.Socket
             {
                 if (result.MessageType == WebSocketMessageType.Text)
                 {
-                    await _webSocketHandler.ReceiveAsync(socket, result, buffer);
+                    var message = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                    var value = message.TryParseJson<ReceiveMessageViewModel>();
+
+                    if (value != null)
+                    {
+                        // Specified user intent
+                        await _webSocketHandler.ReceiveWithAccountInformationAsync(socket, result, buffer, value);
+                    }
+                    else
+                    {
+                        // Broadcast message
+                        await _webSocketHandler.ReceiveAsync(socket, result, buffer);
+                    }
+
                     return;
                 }
 
@@ -58,6 +76,9 @@ namespace WebSocketApplication.Socket
                 handleMessage(result, buffer);
             }
         }
+
+
+
         //// RequestDelegate is used to build the request pipeline. RequestDelegate handles each HTTP request.
         //private readonly RequestDelegate _next;
 

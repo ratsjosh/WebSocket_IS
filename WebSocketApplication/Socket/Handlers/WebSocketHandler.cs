@@ -5,6 +5,7 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using WebSocketApplication.Models;
 
 namespace WebSocketApplication.Socket
 {
@@ -31,11 +32,16 @@ namespace WebSocketApplication.Socket
         {
             if (socket.State != WebSocketState.Open)
                 return;
-
+            
             await socket.SendAsync(new ArraySegment<byte>(Encoding.ASCII.GetBytes(message), 0, message.Length),
                 WebSocketMessageType.Text,
                 true,
                 CancellationToken.None);
+        }
+
+        public async Task SendMessageAsync(string socketId, string message)
+        {
+            await SendMessageAsync(WebSocketConnectionManager.GetSocketById(socketId), message);
         }
 
         public async Task SendMessageToAllAsync(string message)
@@ -48,6 +54,8 @@ namespace WebSocketApplication.Socket
         }
 
         public abstract Task ReceiveAsync(WebSocket socket, WebSocketReceiveResult result, byte[] buffer);
+
+        public abstract Task ReceiveWithAccountInformationAsync(WebSocket socket, WebSocketReceiveResult result, byte[] buffer, ReceiveMessageViewModel receiveMessage);
     }
 
 }
