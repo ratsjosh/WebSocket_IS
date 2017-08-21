@@ -1,7 +1,6 @@
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
 <div class="container">
     <div class="row">
         <div class="col-lg-6">
@@ -25,7 +24,6 @@
                 <p>To:<input type="text" id="to" /></p>
                 <p>content:<input type="text" id="content" /></p>
                 <button type="button" class="btn btn-success" id="sendUserMessage">Send</button>
-
                 <div id="private-chat" class="msg-wrap">
                 </div>
             </div>
@@ -56,8 +54,10 @@
         </div>
     </div>
 </div>
-
 <script>
+    var count = 0;
+    var currentSocketConnection = null;
+
     var btnStart = document.getElementById("send");
     var btnSend = document.getElementById("sendUserMessage");
 
@@ -74,9 +74,7 @@
         if (isJson(e.data) === true) {
             let result = JSON.parse(e.data);
 
-            let currentSocketConnection = sessionStorage.getItem("currentSocketConnection");
             if (currentSocketConnection == null) {
-                sessionStorage.setItem("currentSocketConnection", result.Sender);
                 currentSocketConnection = result.Sender;
             }
 
@@ -89,7 +87,7 @@
                 for (let i = 0; i < connections.length; i++) {
                     if (!$('#' + connections[i]).length && currentSocketConnection != connections[i]) {
                         var $tr = $('<tr>', { id: connections[i] });
-                        var $trCount = $('<td>', { class: "hidden-xs", text: i + 1 });
+                        var $trCount = $('<td>', { class: "hidden-xs", text: count++ });
                         var $trSocket = $('<td>', { text: connections[i] });
                         var $trBtn = $('<td>');
                         var $btn = $('<button>', { class: "btn btn-success", text: "Copy" });
